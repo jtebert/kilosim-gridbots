@@ -41,7 +41,7 @@ target_link_libraries(kilosim_gridbots INTERFACE kilosim)
 
 target_compile_features(kilosim_gridbots INTERFACE cxx_std_11)
 
-install(TARGETS kilosim_gridbots ARCHIVE DESTINATION lib)
+install(TARGETS kilosim_gridbots ARCHIVE DESTINATION ${CMAKE_SOURCE_DIR}/lib)
 
 
 # ------------------------------------------------------------------------------

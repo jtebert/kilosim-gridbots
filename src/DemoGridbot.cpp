@@ -7,7 +7,7 @@ namespace Kilosim
 
         void setup()
         {
-            drive_robot(50, 40);
+            move(1, 1);
             set_led(100, 100, 100);
         };
 

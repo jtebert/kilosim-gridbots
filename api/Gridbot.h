@@ -31,28 +31,20 @@ namespace Kilosim
          */
         std::vector<cb_message_t> m_msg_recv;
 
+        //! x movement # of cells (set by move)
+        double m_move_x_cells = 0;
+        //! y movement # of cells (set by move)
+        double m_move_y_cells = 0;
+
         //! Message to send to other robots (set by send_msg)
         std::string m_msg_send;
-
-        //! Right motor speed (set by drive_robot)
-        double m_motor_speed_r = 0;
-        //! Left motor speed (set by drive_robot)
-        double m_motor_speed_l = 0;
-        //! Conversion from PWM to speed (100% PWM = this mm/s) - left motor
-        double m_motor_rate_l = 500;
-        //! Conversion from PWM to speed (100% PWM = this mm/s) - right motor
-        double m_motor_rate_r = 500;
-        // TODO: Figure out actual conversion from PWM to speed (this also assumes its linear)
-        // TODO: Add some noise to motor rates in initialization
 
         //! Internal clock (in ticks); starts at 0
         unsigned int m_tick = 0;
 
         // PHYSICAL ROBOT PROPERTIES
-        //! Distance between the wheel centers (mm)
-        double m_wheel_dist = 100; // 10 cm
         //! Radius of the robot (mm)
-        double m_radius = 60; // 60 mm (12 cm diameter)
+        double m_radius = 10; // 60 mm (12 cm diameter)
         // TODO: Check on/find out actual wheel distance/separation
 
     protected:
@@ -61,7 +53,11 @@ namespace Kilosim
     public:
         //! Communication range (mm)
         //! This is public so it can be configured by setup/simulation
-        double comm_range = 12 * 10 * 5; //  5 bodylengths (default)
+        double comm_range = m_radius * 2 * 8; //  8 bodylengths (default)
+
+        //! Position in grid cells. This is what you should use for logging
+        int m_grid_x;
+        int m_grid_y;
 
     private:
         /*!
@@ -175,25 +171,25 @@ namespace Kilosim
         virtual void loop() = 0;
 
         /***************************************************************************
-         * COACHBOT/PISWARM API FUNCTIONS
+         * GRIDBOT API FUNCTIONS
          **************************************************************************/
 
         /*!
-         * [Coachbot API] Returns the robot's current orientation and x-y position
+         * [Gridbot API] Returns the robot's current x-y position
          *
-         * Returns a 3-element vector (x, y, theta), which is the robot's x-y position and
-         * orientation theta in a global frame. The unit of `x` and `y` are robot's
-         * radius, specifically, x = 1 y = 0 means the robot is 2.5 radius away from
-         * the origin, and the unit of `theta` is radians.
-         * @return Vector of the robot's (x, y, theta position)
+         * Returns a 2-element vector (x, y), which is the robot's x-y position in a global frame.
+         * The unit of `x` and `y` are robot's radius, specifically, x = 1 y = 0 means the robot is
+         * 2.5 radii away from the origin.
+         * (These values come from Robot.h)
+         * @return Vector of the robot's (x, y position)
          */
-        std::vector<double> get_pose()
+        std::vector<double> get_pos()
         {
-            return {x, y, theta};
+            return {x, y};
         }
 
         /*!
-         * [Coachbot API] Returns the messages received since last time the function
+         * [Gridbot API] Returns the messages received since last time the function
          * was called
          *
          * Returns the messages received from the other robots, then cleans the
@@ -215,10 +211,9 @@ namespace Kilosim
         }
 
         /*!
-         * [Coachbot API] Transmits the message `msg` to the other robots
+         * [Gridbot API] Transmits the message `msg` to the other robots
          *
-         * The input should be a string with a length of 128 bytes (This length can
-         * be changed if it is necessary).
+         * The input should be a string of (currently) arbitrary length.
          *
          * @param msg Message to send to all other robots within communication range
          */
@@ -234,24 +229,19 @@ namespace Kilosim
         }
 
         /*!
-         * [Coachbot API] Send the speeds and directions of the robot's wheels
+         * [Gridbot API] Number of cells to move in x and y
          *
-         * the `l` and `r` should be integers ranging from -100 to 100. The absolute
-         * value is the PWM duty cycle percentage, and the sign controls the
-         * direction of the wheel.
-         *
-         * @param l PWM percentage of the left wheel (-100 to 100; sign is direction)
-         * @param r PWM percentage of the right wheel (-100 to 100; sign is direction)
+         * @param int Number of cells to move in x direction
+         * @param int Number of cells to move in y direction
          */
-        void drive_robot(double l, double r)
+        void move(int x, int y)
         {
-            m_motor_speed_l = l;
-            m_motor_speed_r = r;
-            // Convert these into forward_speed and turn_speed to match Robot/run_controller
+            m_move_x_cells = x;
+            m_move_y_cells = y;
         }
 
         /*!
-         * [Coachbot API] Configure the color and brightness of the robot's LED
+         * [Gridbot API] Configure the color and brightness of the robot's LED
          *
          * `r`, `g`, `b`, should be integers ranging from 0 to 100. Each number
          * controls the intensity of the corresponding channel of the LED.
@@ -273,74 +263,72 @@ namespace Kilosim
          *
          * @return Seconds since the code started
          */
-        double get_clock()
+        double get_tick()
         {
             // Matches the way this is handled by World
-            // (Stored internally as integer to avoid floating point errors)
-            return (double)m_tick * m_tick_delta_t;
+            return m_tick;
         }
 
     public:
         /*!
-         * Override the Robot pseudophysics to simulate the Coachbot differential drive
+         * Override the Robot pseudophysics to move on a grid
          */
-        RobotPose robot_compute_next_step() const
+        RobotPose robot_compute_next_step() const override
         {
-            // Use the current pose and the motor speeds
+            // Use the current position
             // This function does NOT do the collision checking
-            // Assume theta is 0 when pointing along x axis
-            // TODO: Check directions of axes (might be off/backwards from display)
 
-            // Uses the differential drive kinematics from here:
-            // https://www8.cs.umu.se/kurser/5DV122/HT13/material/Hellstrom-ForwardKinematics.pdf
+            double new_x, new_y;
 
-            // 0) Convert wheel PWM to speeds
-            double v_l = m_motor_speed_l * m_motor_rate_l / 100;
-            double v_r = m_motor_speed_r * m_motor_rate_r / 100;
+            // Convert movement in cells to movement in screen/IRL space
+            new_x = x + m_move_x_cells * m_radius * 2;
+            new_y = y + m_move_y_cells * m_radius * 2;
 
-            double new_x, new_y, new_theta;
+            // std::cout << id << ": " << new_x << ", " << new_y << std::endl;
 
-            if (v_l == v_r)
+            // We're not using angle, so just always set it to 0.
+            return {new_x, new_y, 0};
+        }
+
+        /*!
+         * Override the Robot movement based on collisions.
+         * In this case, we IGNORE any collisions with other robots (ie they're allowed to intersect)
+         * but we still prevent moving outside of the arena.
+         */
+        void robot_move(const RobotPose &new_pose, const int16_t &collision) override
+        {
+            // TODO: Let robots collide with each other. (see this func in kilosim/Robot.cpp)
+            if (collision != -1)
             {
-                // Special case where robot is going straight. If you put this
-                // through the full differential drive kinematics, you get 0 in the
-                // denominator.
-                double dx = v_l * cos(theta) * m_tick_delta_t;
-                double dy = v_l * sin(theta) * m_tick_delta_t;
-                new_x = x + dx;
-                new_y = y + dy;
-                new_theta = theta; // Same angle because going straight
+                x = new_pose.x;
+                y = new_pose.y;
             }
-            else
-            {
-                // 1) Compute R - distance between robot center and ICC
-                //    R = l/2 * (v_l+v_r)/(v_r-v_l), where l is distance between wheels
-                double R = (m_wheel_dist / 2) *
-                           ((v_l + v_r) / (v_r - v_l));
+            // Otherwise it's a wall collision
+            std::cout << x << ", " << y << std::endl;
+            printf("here\n");
+        }
 
-                // 2) Compute the velocity around the ICC
-                //    omega = (v_r-v_l)/l
-                double omega = (v_r - v_l) / m_wheel_dist;
+        /*!
+         * Override the default robot_init to place the robot on a grid position.
+         * Here, x0 and y0 are now GRID positions
+         */
+        void robot_init(double x0, double y0, double theta0)
+        {
+            x = (x0 * m_radius * 2) + m_radius;
+            y = (y0 * m_radius * 2) + m_radius;
+            theta0 = 0.0;
 
-                // 3) Compute the ICC (instantaneous center of curvature)
-                //    ICC_x = x - R*sin(theta)
-                //    ICC_y = y + R*cos(theta)
-                double icc_x = x - (R * sin(theta));
-                double icc_y = y + (R * cos(theta));
+            m_grid_x = x0;
+            m_grid_y = y0;
 
-                // 4) Compute new x, y, theta from the above
-                //    x' = cos(omega*dt) * (x-ICC_x) + -sin(omega*dt) * (y-ICC_y) + ICC_x
-                //    y' = sin(omega*dt) * (x-ICC_x) +  cos(omega*dt) * (y-ICC_y) + ICC_y
-                //    theta' = omega * dt + theta
-                double omega_dt = omega * m_tick_delta_t;
-                new_x = (cos(omega_dt) * (x - icc_x)) - (sin(omega_dt) * (y - icc_y)) + icc_x;
-                new_y = (sin(omega_dt) * (x - icc_x)) + (cos(omega_dt) * (y - icc_y)) + icc_y;
-                new_theta = omega_dt + theta;
-            }
+            // Assign unique ID
+            id = uniform_rand_int(0, 2147483640);
 
-            // std::cout << id << ": " << new_x << ", " << new_y << ", " << new_theta << std::endl;
+            std::cout << x0 << ", " << y0 << std::endl;
+            std::cout << x << ", " << y << std::endl;
 
-            return {new_x, new_y, wrap_angle(new_theta)};
+            // Run implementation-specific initialization
+            init();
         }
 
         // IDK what this does but it won't compile without it
