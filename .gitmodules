@@ -1,0 +1,4 @@
+[submodule "submodules/kilosim"]
+	path = submodules/kilosim
+	url = hhtps://github.com/jtebert/kilosim
+	branch = julia/modularity
