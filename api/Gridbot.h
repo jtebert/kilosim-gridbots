@@ -44,8 +44,11 @@ namespace Kilosim
 
         // PHYSICAL ROBOT PROPERTIES
         //! Radius of the robot (mm)
-        double m_radius = 10; // 60 mm (12 cm diameter)
+        double m_radius = 9;
         // TODO: Check on/find out actual wheel distance/separation
+
+        //! Dimensions of a grid cell (in mm)
+        double m_grid_dim = 10;
 
     protected:
         // TODO: Fill in any protected variables as needed
@@ -53,7 +56,7 @@ namespace Kilosim
     public:
         //! Communication range (mm)
         //! This is public so it can be configured by setup/simulation
-        double comm_range = m_radius * 2 * 8; //  8 bodylengths (default)
+        double comm_range = m_grid_dim * 2 * 8; //  8 bodylengths (default)
 
         //! Position in grid cells. This is what you should use for logging
         int m_grid_x;
@@ -281,8 +284,8 @@ namespace Kilosim
             double new_x, new_y;
 
             // Convert movement in cells to movement in screen/IRL space
-            new_x = x + m_move_x_cells * m_radius * 2;
-            new_y = y + m_move_y_cells * m_radius * 2;
+            new_x = x + m_move_x_cells * m_grid_dim * 2;
+            new_y = y + m_move_y_cells * m_grid_dim * 2;
 
             // std::cout << id << ": " << new_x << ", " << new_y << std::endl;
 
@@ -297,15 +300,13 @@ namespace Kilosim
          */
         void robot_move(const RobotPose &new_pose, const int16_t &collision) override
         {
-            // TODO: Let robots collide with each other. (see this func in kilosim/Robot.cpp)
             if (collision != -1)
             {
+                // Execute move whether there's a collision or not
                 x = new_pose.x;
                 y = new_pose.y;
             }
-            // Otherwise it's a wall collision
-            std::cout << x << ", " << y << std::endl;
-            printf("here\n");
+            // Otherwise it's a wall collision. In that case, just stay put
         }
 
         /*!
@@ -314,8 +315,8 @@ namespace Kilosim
          */
         void robot_init(double x0, double y0, double theta0)
         {
-            x = (x0 * m_radius * 2) + m_radius;
-            y = (y0 * m_radius * 2) + m_radius;
+            x = (x0 * m_grid_dim * 2) + m_grid_dim;
+            y = (y0 * m_grid_dim * 2) + m_grid_dim;
             theta0 = 0.0;
 
             m_grid_x = x0;
@@ -323,9 +324,6 @@ namespace Kilosim
 
             // Assign unique ID
             id = uniform_rand_int(0, 2147483640);
-
-            std::cout << x0 << ", " << y0 << std::endl;
-            std::cout << x << ", " << y << std::endl;
 
             // Run implementation-specific initialization
             init();

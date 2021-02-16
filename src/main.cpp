@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 
     Kilosim::Viewer viewer(world, 1200);
 
-    int num_robots = 1;
+    int num_robots = 10;
 
     // Create robots and place in world
     std::vector<Kilosim::DemoGridbot *> robots(num_robots);
@@ -20,11 +20,11 @@ int main(int argc, char *argv[])
     {
         robots[n] = new Kilosim::DemoGridbot();
         world.add_robot(robots[n]);
-        robots[n]->robot_init(n, n, 0);
+        robots[n]->robot_init(0, 0, 0);
     }
 
     // Verify that robots are within World bounds and not overlapping
-    world.check_validity();
+    // world.check_validity();
 
     double trial_duration = 300; // seconds
     sleep(2);
