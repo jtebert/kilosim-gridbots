@@ -49,6 +49,7 @@ install(TARGETS kilosim_gridbots ARCHIVE DESTINATION ${CMAKE_SOURCE_DIR}/lib)
 # EXECUTABLE DEMO
 
 add_executable(gridbots_example EXCLUDE_FROM_ALL
+  src/utils.cpp
   src/DemoGridbot.cpp
   src/main.cpp
 )

@@ -2,6 +2,8 @@
 #include <kilosim/Random.h>
 #include <string>
 
+#include "utils.h"
+
 namespace Kilosim
 {
 
@@ -273,6 +275,10 @@ namespace Kilosim
         }
 
     public:
+        std::vector<Pos> gen_line(const int x0, const int y0, const int x1, const int y1) const
+        {
+            return create_line(x0, y0, x1, y1);
+        }
         /*!
          * Override the Robot pseudophysics to move on a grid
          */

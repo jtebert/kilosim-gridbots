@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 
     Kilosim::Viewer viewer(world, 1200);
 
-    int num_robots = 10;
+    int num_robots = 1;
 
     // Create robots and place in world
     std::vector<Kilosim::DemoGridbot *> robots(num_robots);
@@ -21,6 +21,12 @@ int main(int argc, char *argv[])
         robots[n] = new Kilosim::DemoGridbot();
         world.add_robot(robots[n]);
         robots[n]->robot_init(0, 0, 0);
+    }
+
+    std::vector<Pos> path = robots[0]->gen_line(10, 10, 12, 5);
+    for (int i = 0; i < path.size(); i++)
+    {
+        std::cout << path[i].x << ", " << path[i].y << std::endl;
     }
 
     // Verify that robots are within World bounds and not overlapping
