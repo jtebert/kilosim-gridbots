@@ -24,10 +24,10 @@ int main(int argc, char *argv[])
     }
 
     std::vector<Pos> path = robots[0]->gen_line(10, 10, 12, 5);
-    for (int i = 0; i < path.size(); i++)
-    {
-        std::cout << path[i].x << ", " << path[i].y << std::endl;
-    }
+    // for (int i = 0; i < path.size(); i++)
+    // {
+    //     std::cout << path[i].x << ", " << path[i].y << std::endl;
+    // }
 
     // Verify that robots are within World bounds and not overlapping
     // world.check_validity();

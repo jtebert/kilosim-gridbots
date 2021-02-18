@@ -6,6 +6,12 @@
 #include "utils.h"
 
 // Bresenham's line algorithm
+// https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
+
+bool operator<(const Pos &x, const Pos &y)
+{
+    return std::tie(x.x, x.y) < std::tie(y.x, y.y);
+}
 
 std::vector<Pos> line_low(const int x0, const int y0, const int x1, const int y1)
 {
