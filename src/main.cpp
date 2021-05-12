@@ -8,7 +8,8 @@ int main(int argc, char *argv[])
 {
     // Create 3m x 3m world (no background image, for now)
     Kilosim::World world(
-        3000, 3000);
+        80, 80, "../imgs/8x8-test.png" // World image
+    );
 
     Kilosim::Viewer viewer(world, 1200);
 
@@ -20,7 +21,7 @@ int main(int argc, char *argv[])
     {
         robots[n] = new Kilosim::DemoGridbot();
         world.add_robot(robots[n]);
-        robots[n]->robot_init(0, 0, 0);
+        robots[n]->robot_init(n, n, 0);
     }
 
     std::vector<Pos> path = robots[0]->gen_line(10, 10, 12, 5);
@@ -37,9 +38,9 @@ int main(int argc, char *argv[])
     while (world.get_time() < trial_duration)
     {
         // printf("stepping\n");
-        world.step();
         viewer.draw();
-        sleep(.25);
+        world.step();
+        sleep(2);
     }
 
     printf("Finished");

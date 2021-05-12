@@ -49,7 +49,7 @@ namespace Kilosim
 
         // PHYSICAL ROBOT PROPERTIES
         //! Radius of the robot (mm)
-        double m_radius = 9;
+        double m_radius = 4.9; // Must be < m_grid_dim/2 (to avoid wall collisions at edges)
         // TODO: Check on/find out actual wheel distance/separation
 
         //! Dimensions of a grid cell (in mm)
@@ -299,16 +299,28 @@ namespace Kilosim
             Pos grid_curr_pos = xy_to_grid(x, y);
             for (int i = 0; i < pos_diff.size(); i++)
             {
-
                 Pos grid_pos_diff = {grid_curr_pos.x + pos_diff[i].x,
                                      grid_curr_pos.y + pos_diff[i].y};
-                Pos mm_pos_diff = grid_to_xy(pos_diff[i]);
-                double sample_val = m_light_pattern->get_ambientlight(
-                    x + mm_pos_diff.x,
-                    y + mm_pos_diff.y);
+
+                int sample_pos_x = x + pos_diff[i].x * m_grid_dim;
+                int sample_pos_y = y + pos_diff[i].y * m_grid_dim;
+
+                double sample_val;
+                // Check if x or y is outside the arena bounds
+                if (sample_pos_x < 0 || sample_pos_y < 0 || sample_pos_x > m_arena_width || sample_pos_y > m_arena_height)
+                {
+                    sample_val = -1;
+                }
+                else
+                {
+                    sample_val = m_light_pattern->get_ambientlight(
+                        sample_pos_x,
+                        sample_pos_y);
+                }
+                std::cout << "SAMPLE: " << sample_pos_x << ", " << sample_pos_y << ": " << sample_val << std::endl;
                 samples.insert({grid_pos_diff, sample_val});
             }
-            // TODO: What happens if a sample is outside of the arena?
+            // TODO: What happens if a sample is outside of the arena? -> segfault lol
             return samples;
         }
 
@@ -323,8 +335,8 @@ namespace Kilosim
         // TODO: Make this return doubles?
         Pos grid_to_xy(Pos p)
         {
-            return {(p.x * m_grid_dim * 2) + m_grid_dim,
-                    (p.y * m_grid_dim * 2) + m_grid_dim};
+            return {(p.x * m_grid_dim) + (float)m_grid_dim / 2,
+                    (p.y * m_grid_dim) + (float)m_grid_dim / 2};
         }
 
     public:
@@ -355,10 +367,9 @@ namespace Kilosim
             else
             {
                 // Convert movement in cells to movement in screen/IRL space
-                new_x = x + m_move_x_cells * m_grid_dim * 2;
-                new_y = y + m_move_y_cells * m_grid_dim * 2;
+                new_x = x + m_move_x_cells * m_grid_dim;
+                new_y = y + m_move_y_cells * m_grid_dim;
             }
-            // std::cout << id << ": " << new_x << ", " << new_y << std::endl;
 
             // We're not using angle, so just always set it to 0.
             return {new_x, new_y, 0};
@@ -387,7 +398,7 @@ namespace Kilosim
          */
         void robot_init(double x0, double y0, double theta0) override
         {
-            Pos init_pos = xy_to_grid(x0, y0);
+            Pos init_pos = grid_to_xy({x0, y0});
             x = init_pos.x;
             y = init_pos.y;
             theta0 = 0.0;

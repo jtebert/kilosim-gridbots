@@ -9,22 +9,23 @@ namespace Kilosim
         void setup()
         {
             move(1, 1);
-            set_led(100, 100, 100);
+            set_led(100, 0, 0);
         };
 
         void loop()
         {
-            if (m_test <= 6)
+            // std::cout << m_grid_x << ", " << m_grid_y << std::endl;
+            if (m_test <= 8)
             {
                 std::cout << "\n"
                           << m_test << std::endl;
                 std::map<Pos, double> samples = sample_around();
                 std::cout << samples.size() << std::endl;
-                for (auto const &x : samples)
+                for (auto const &s : samples)
                 {
-                    std::cout << x.first.x << ", " << x.first.y // string (key)
+                    std::cout << s.first.x << ", " << s.first.y // string (key)
                               << ": "
-                              << x.second // string's value
+                              << s.second // string's value
                               << std::endl;
                 }
             }
