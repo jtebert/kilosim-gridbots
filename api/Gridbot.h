@@ -317,7 +317,6 @@ namespace Kilosim
                         sample_pos_x,
                         sample_pos_y);
                 }
-                std::cout << "SAMPLE: " << sample_pos_x << ", " << sample_pos_y << ": " << sample_val << std::endl;
                 samples.insert({grid_pos_diff, sample_val});
             }
             // TODO: What happens if a sample is outside of the arena? -> segfault lol
@@ -340,9 +339,12 @@ namespace Kilosim
         }
 
     public:
-        std::vector<Pos> gen_line(const int x0, const int y0, const int x1, const int y1) const
+        void set_path(const int x0, const int y0, const int x1, const int y1)
         {
-            return create_line(x0, y0, x1, y1);
+            std::vector<Pos> path = create_line(x0, y0, x1, y1);
+            m_path_to_target.resize(path.size());
+            m_path_to_target = path;
+            m_follow_path = true;
         }
         /*!
          * Override the Robot pseudophysics to move on a grid
@@ -360,8 +362,9 @@ namespace Kilosim
             {
                 // Follow the next position in the pre-computed path
                 Pos new_pos = m_path_to_target.back();
-                new_x = new_pos.x;
-                new_y = new_pos.y;
+                // std::cout << new_pos.x << ", " << new_pos.y << std::endl;
+                new_x = new_pos.x * m_grid_dim;
+                new_y = new_pos.y * m_grid_dim;
                 m_path_to_target.pop_back(); // I hope this doesn't break reference for x, y
             }
             else

@@ -46,7 +46,7 @@ static std::vector<Pos> line_low(const int x0, const int y0, const int x1, const
   int x_len = x1 - x0 + 1;
   int x;
   std::vector<Pos> path(x_len);
-  for (int x_ind = 0; x_ind <= x_len; x_ind++)
+  for (int x_ind = 0; x_ind < x_len; x_ind++)
   {
     x = x_ind + x0;
     path[x_ind] = {x, y};
@@ -78,7 +78,7 @@ static std::vector<Pos> line_high(const int x0, const int y0, const int x1, cons
   int y_len = y1 - y0 + 1;
   int y;
   std::vector<Pos> path(y_len);
-  for (int y_ind = 0; y_ind <= y_len; y_ind++)
+  for (int y_ind = 0; y_ind < y_len; y_ind++)
   {
     y = y_ind + y0;
     path[y_ind] = {x, y};

@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
 {
     // Create 3m x 3m world (no background image, for now)
     Kilosim::World world(
-        80, 80, "../imgs/8x8-test.png" // World image
+        800, 800, "../imgs/8x8-test.png" // World image
     );
 
     Kilosim::Viewer viewer(world, 1200);
@@ -24,14 +24,14 @@ int main(int argc, char *argv[])
         robots[n]->robot_init(n, n, 0);
     }
 
-    std::vector<Pos> path = robots[0]->gen_line(10, 10, 12, 5);
+    // Verify that robots are within World bounds and not overlapping
+    // world.check_validity();
+
+    // std::vector<Pos> path = create_line(0, 0, 10, 20);
     // for (int i = 0; i < path.size(); i++)
     // {
     //     std::cout << path[i].x << ", " << path[i].y << std::endl;
     // }
-
-    // Verify that robots are within World bounds and not overlapping
-    // world.check_validity();
 
     double trial_duration = 300; // seconds
     sleep(2);
@@ -40,10 +40,10 @@ int main(int argc, char *argv[])
         // printf("stepping\n");
         viewer.draw();
         world.step();
-        sleep(2);
+        usleep(250000);
     }
 
-    printf("Finished");
+    printf("Finished\n");
 
     return 0;
 }
