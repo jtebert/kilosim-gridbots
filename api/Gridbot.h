@@ -55,11 +55,11 @@ namespace Kilosim
         //! Dimensions of a grid cell (in mm)
         double m_grid_dim = 10;
 
+    protected:
         //! Dimensions of the world in # of grid cells (instead of mm)
         int m_arena_grid_height;
         int m_arena_grid_width;
 
-    protected:
         //! Map of observed values in the environment. -1 means unobserved
         std::vector<std::vector<int>> m_map;
 
