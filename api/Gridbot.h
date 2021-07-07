@@ -200,7 +200,7 @@ namespace Kilosim
          * (These values come from Robot.h)
          * @return Vector of the robot's (x, y position)
          */
-        std::vector<int> get_pos()
+        Pos get_pos()
         {
             return {m_grid_x, m_grid_y};
         }
