@@ -19,7 +19,7 @@ struct Pos
         y(y) {}
 };
 
-bool operator==(const Pos &lhs, const Pos &rhs)
+static bool operator==(const Pos &lhs, const Pos &rhs)
 {
   // Custom equality operator for position (pos) structures
   return lhs.x == rhs.x && lhs.y == rhs.y;
