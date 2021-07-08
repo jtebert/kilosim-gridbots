@@ -345,6 +345,8 @@ namespace Kilosim
             m_path_to_target.resize(path.size());
             m_path_to_target = path;
             m_follow_path = true;
+            // When a path is set, turn off other movement
+            move(0, 0);
         }
         /*!
          * Override the Robot pseudophysics to move on a grid
@@ -365,7 +367,11 @@ namespace Kilosim
                 // std::cout << new_pos.x << ", " << new_pos.y << std::endl;
                 new_x = new_pos.x * m_grid_dim + m_grid_dim / 2;
                 new_y = new_pos.y * m_grid_dim + m_grid_dim / 2;
-                m_path_to_target.pop_back(); // I hope this doesn't break reference for x, y
+                m_path_to_target.pop_back();
+                if (m_path_to_target.size() == 0)
+                {
+                    m_follow_path = false;
+                }
             }
             else
             {
