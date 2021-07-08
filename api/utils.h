@@ -19,6 +19,12 @@ struct Pos
         y(y) {}
 };
 
+bool operator==(const Pos &lhs, const Pos &rhs)
+{
+  // Custom equality operator for position (pos) structures
+  return lhs.x == rhs.x && lhs.y == rhs.y;
+}
+
 // bool operator<(const Pos &x, const Pos &y);
 
 // std::vector<Pos> create_line(const int x0, const int y0, const int x1, const int y1);
