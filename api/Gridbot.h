@@ -363,8 +363,8 @@ namespace Kilosim
                 // Follow the next position in the pre-computed path
                 Pos new_pos = m_path_to_target.back();
                 // std::cout << new_pos.x << ", " << new_pos.y << std::endl;
-                new_x = new_pos.x * m_grid_dim;
-                new_y = new_pos.y * m_grid_dim;
+                new_x = new_pos.x * m_grid_dim + m_grid_dim / 2;
+                new_y = new_pos.y * m_grid_dim + m_grid_dim / 2;
                 m_path_to_target.pop_back(); // I hope this doesn't break reference for x, y
             }
             else
