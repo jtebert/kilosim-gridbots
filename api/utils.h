@@ -101,7 +101,7 @@ static std::vector<Pos> line_high(const int x0, const int y0, const int x1, cons
   return path;
 }
 
-static std::vector<Pos> create_line(const int x0, const int y0, const int x1, const int y1)
+static std::vector<Pos> create_line(int x0, int y0, int x1, int y1)
 {
   /*
      * Returned vectors are created to have positions popped from the end.
@@ -119,7 +119,15 @@ static std::vector<Pos> create_line(const int x0, const int y0, const int x1, co
   if (x0 == x1)
   {
     // vertical
-    int y_len = abs(y1 - y0) + 1;
+    if (y0 > y1)
+    {
+      std::swap(y0, y1);
+    }
+    else
+    {
+      is_reversed = true;
+    }
+    int y_len = y1 - y0 + 1;
     path.resize(y_len);
     for (int y_ind = 0; y_ind < y_len; y_ind++)
     {
@@ -129,7 +137,15 @@ static std::vector<Pos> create_line(const int x0, const int y0, const int x1, co
   else if (y0 == y1)
   {
     // horizontal
-    int x_len = abs(x1 - x0) + 1;
+    if (x0 > x1)
+    {
+      std::swap(x0, x1);
+    }
+    else
+    {
+      is_reversed = true;
+    }
+    int x_len = x1 - x0 + 1;
     // std::cout << x_len << std::endl;
     path.resize(x_len);
     for (int x_ind = 0; x_ind < x_len; x_ind++)

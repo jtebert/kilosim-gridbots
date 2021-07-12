@@ -360,6 +360,14 @@ namespace Kilosim
             {
                 // Follow the next position in the pre-computed path
                 Pos new_pos = m_path_to_target.back();
+                // Pos curr_pos = get_pos();
+                // int x_diff = curr_pos.x - new_pos.x;
+                // int y_diff = curr_pos.y - new_pos.y;
+                // if (x_diff > 1 || x_diff < -1 || y_diff > 1 || y_diff < -1)
+                // {
+                //     printf("INVALID POSITION CHANGE:\n");
+                //     std::cout << "(" << curr_pos.x << "," << curr_pos.y << ") -> (" << new_pos.x << "," << new_pos.y << ")" << std::endl;
+                // }
                 // std::cout << new_pos.x << ", " << new_pos.y << std::endl;
                 new_x = new_pos.x * m_grid_dim + m_grid_dim / 2;
                 new_y = new_pos.y * m_grid_dim + m_grid_dim / 2;
