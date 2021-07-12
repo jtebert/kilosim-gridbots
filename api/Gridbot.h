@@ -72,10 +72,6 @@ namespace Kilosim
         //! This is public so it can be configured by setup/simulation
         double comm_range = m_grid_dim * 2 * 8; //  8 bodylengths (default)
 
-        //! Position in grid cells. This is what you should use for logging
-        int m_grid_x;
-        int m_grid_y;
-
     private:
         /*!
          * Get a void pointer to the message the robot is sending and handle any
@@ -202,7 +198,7 @@ namespace Kilosim
          */
         Pos get_pos()
         {
-            return {m_grid_x, m_grid_y};
+            return xy_to_grid(x, y);
         }
 
         /*!
@@ -411,9 +407,6 @@ namespace Kilosim
             x = init_pos.x;
             y = init_pos.y;
             theta0 = 0.0;
-
-            m_grid_x = x0;
-            m_grid_y = y0;
 
             // Assign unique ID
             id = uniform_rand_int(0, 2147483640);

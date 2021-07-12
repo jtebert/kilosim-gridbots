@@ -18,8 +18,6 @@ namespace Kilosim
 
         void loop()
         {
-
-            // std::cout << m_grid_x << ", " << m_grid_y << std::endl;
             if (m_test <= 8)
             {
                 // std::cout << "\n"
