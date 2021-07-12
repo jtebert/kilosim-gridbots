@@ -119,7 +119,7 @@ static std::vector<Pos> create_line(const int x0, const int y0, const int x1, co
     int y_len = y1 - y0 + 1;
     // std::cout << y_len << std::endl;
     path.resize(y_len);
-    for (int y_ind = 0; y_ind <= y_len; y_ind++)
+    for (int y_ind = 0; y_ind < y_len; y_ind++)
     {
       path[y_ind] = {x0, y_ind + y0};
     }
@@ -130,7 +130,7 @@ static std::vector<Pos> create_line(const int x0, const int y0, const int x1, co
     int x_len = x1 - x0 + 1;
     // std::cout << x_len << std::endl;
     path.resize(x_len);
-    for (int x_ind = 0; x_ind <= x_len; x_ind++)
+    for (int x_ind = 0; x_ind < x_len; x_ind++)
     {
       path[x_ind] = {x_ind + x0, y0};
     }
