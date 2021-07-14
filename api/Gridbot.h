@@ -234,10 +234,10 @@ namespace Kilosim
         {
             message_t out_msg;
             out_msg.data = msg;
-            // Assign a random 32-bit integer to tag the message
+            // Assign a random 16-bit integer to tag the message
             // Yeah, this isn't cryptographically secure or anything; it doesn't
             // need to be. It's a simulator-specific hack
-            out_msg.uid = uniform_rand_int(0, UINT32_MAX);
+            out_msg.uid = uniform_rand_int(0, INT32_MAX);
             m_msg_send = msg;
         }
 
