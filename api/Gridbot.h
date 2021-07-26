@@ -118,13 +118,13 @@ namespace Kilosim
             message_t &rx_msg = *(static_cast<message_t *>(msg));
             uint32_t rx_uid = rx_msg.uid;
             // Check if the message is a duplicate by using its UID
-            for (unsigned int i = 0; i < m_msg_recv.size(); i++)
-            {
-                if (m_msg_recv[i].uid == rx_uid)
-                {
-                    return;
-                }
-            }
+            // for (unsigned int i = 0; i < m_msg_recv.size(); i++)
+            // {
+            // if (m_msg_recv[i].uid == rx_uid)
+            // {
+            //     return;
+            // }
+            // }
             // Add the message to the buffer if UID not found
             m_msg_recv.push_back(rx_msg);
         }
