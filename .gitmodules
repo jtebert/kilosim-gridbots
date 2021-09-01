@@ -1,4 +1,5 @@
 [submodule "submodules/kilosim"]
 	path = submodules/kilosim
 	url = https://github.com/jtebert/kilosim
-	branch = julia/modularity
+	branch = julia/viewer-addons
+	update = merge
