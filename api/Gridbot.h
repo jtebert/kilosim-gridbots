@@ -338,8 +338,24 @@ namespace Kilosim
         }
 
     public:
-        void set_path(const int x0, const int y0, const int x1, const int y1)
+        void set_path(const int x0, const int y0, int x1, int y1)
         {
+            // This takes care of an edge case where it tries to generate paths
+            // longer than the max length of a C++ vector......
+            double dist = sqrt(pow(x0 - x1, 2) + pow(y0 - y1, 2));
+            double max_dist = 1000;
+            if (dist > max_dist)
+            {
+                // This is too long; cut it down to the max length
+                if (x1 - x0 != 0)
+                {
+                    x1 = ((x1 - x0) * max_dist / dist) + x0;
+                }
+                if (y1 - y0 != 0)
+                {
+                    y1 = ((y1 - y0) * max_dist / dist) + y0;
+                }
+            }
             std::vector<Pos> path = create_line(x0, y0, x1, y1);
             m_path_to_target.resize(path.size());
             m_path_to_target = path;
